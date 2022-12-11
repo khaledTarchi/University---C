@@ -1,25 +1,38 @@
-# Display message "Give an integer:"
-li $v0, 4
-la $a0, message
-syscall
+# Display message "Give an Integer:"
+li $v0, 4          # Load the syscall code for printing a string into $v0
+la $a0, message    # Load the address of the message string into $a0
+syscall            # Print the message
 
 # Read an integer
-li $v0, 5
-syscall
-
-# Save the integer in a register
-move $t0, $v0
+li $v0, 5          # Load the syscall code for reading an integer into $v0
+syscall            # Read the integer from input and store it in $v0
 
 # Test if the number is positive or negative
-bgez $t0, positive
-li $v0, 4
-la $a0, negative
-syscall
-j done
+beq $v0, $zero, positive   # Branch to the "positive" label if the number is zero
+slt $t0, $zero, $v0        # Set $t0 to 1 if the number is negative, 0 otherwise
+beq $t0, $zero, positive   # Branch to the "positive" label if the number is positive
 
+# If the code reaches here, the number is negative
+li $v0, 4          # Load the syscall code for printing a string into $v0
+la $a0, negative   # Load the address of the "negative" message string into $a0
+syscall            # Print the "negative" message
+j end              # Jump to the "end" label
+
+# If the code reaches here, the number is zero or positive
 positive:
-li $v0, 4
-la $a0, positive
-syscall
+li $v0, 4          # Load the syscall code for printing a string into $v0
+la $a0, positive   # Load the address of the "positive" message string into $a0
+syscall            # Print the "positive" message
 
-done:
+# End of program
+end:
+li $v0, 10         # Load the syscall code for exiting the program into $v0
+syscall            # Exit the program
+
+# String data for messages
+message:
+.asciiz "Give an Integer: "
+positive:
+.asciiz "The number is positive."
+negative:
+.asciiz "The number is negative."
